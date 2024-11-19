@@ -51,6 +51,56 @@ class Camera {
                 this.y = mouseWorldY * this.zoom - this.mouseY;
             }
         });
+
+        // Touch zoom variables
+                this.touchStartDistance = 0;
+                this.touchStartZoom = 1;
+                
+        // Touch events for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                // Calculate initial pinch distance
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                this.touchStartDistance = Math.sqrt(dx * dx + dy * dy);
+                this.touchStartZoom = this.zoom;
+            }
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+           
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const newDistance = Math.sqrt(dx * dx + dy * dy);
+                
+                const zoomDelta = newDistance / this.touchStartDistance;
+                const newZoom = this.touchStartZoom * zoomDelta;
+                
+                this.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+                e.preventDefault();
+            }
+        });
+
+
+        let touchTimeout;
+        canvas.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                touchTimeout = setTimeout(() => {
+                    const worldPos = this.screenToWorld(e.touches[0].clientX, e.touches[0].clientY);
+                    this.hoveredTile = worldPos;
+                }, 500); // 500ms hold to show preview
+            }
+        });
+
+        canvas.addEventListener('touchend', () => {
+            clearTimeout(touchTimeout);
+        });
+
+         canvas.addEventListener('touchcancel', () => {
+            clearTimeout(touchTimeout);
+        });  
+
     }
 
     update(mapWidth, mapHeight) {

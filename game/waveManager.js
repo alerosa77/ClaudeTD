@@ -2,7 +2,7 @@ class WaveManager {
     constructor() {
         this.waveNumber = 0;
         this.enemies = [];
-        this.preparationTime = 0; // 90 seconds before first wave
+        this.preparationTime = 90; // 90 seconds before first wave
         this.timeUntilNextWave = this.preparationTime;
         this.waveInProgress = false;
     }

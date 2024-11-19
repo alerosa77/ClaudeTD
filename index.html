@@ -1,29 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Harvest Game</title>
+    <title>ClaudeTD</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@300&display=swap" rel="stylesheet">
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-   <div id="ui">
-    <div class="stats">
-        DNA Units: <span id="duDisplay">120</span>
+   <div id="startScreen" class="absolute inset-0 bg-black z-50 cursor-pointer">
+        <div id="introText">
+            <span>
+                They are coming... you must defend yourself<br><br>
+                Power plants will generate sparks<br>
+                Sparks will power up harvesters and towers<br>
+                Harvesters will extract DNA from nearby resources<br>
+                Pylons will create your spark network
+            </span>
+        </div>
     </div>
-    <button class="button" onclick="selectBuilding('powerPlant')">
-        Power Plant <span class="cost">50 DU</span>
-    </button>
-    <button class="button" onclick="selectBuilding('pylon')">
-        Pylon <span class="cost">5 DU</span>
-    </button>
-    <button class="button" onclick="selectBuilding('harvester')">
-        Harvester <span class="cost">10 DU</span>
-    </button>
-    <button class="button" onclick="selectBuilding('tower')">
-        Tower <span class="cost">20 DU</span>
-    </button>
-</div>
+    
+    <div id="gameContent" style="display: none;">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div class="stats">
+                DNA Units: <span id="duDisplay">120</span>
+            </div>
+            <button class="button" onclick="selectBuilding('powerPlant')">
+                Power Plant <span class="cost">50 DU</span>
+            </button>
+            <button class="button" onclick="selectBuilding('pylon')">
+                Pylon <span class="cost">5 DU</span>
+            </button>
+            <button class="button" onclick="selectBuilding('harvester')">
+                Harvester <span class="cost">10 DU</span>
+            </button>
+            <button class="button" onclick="selectBuilding('tower')">
+                Tower <span class="cost">20 DU</span>
+            </button>
+        </div>
+    </div>
 
  <!-- Core scripts in correct order -->
 <script src="core/constants.js"></script>

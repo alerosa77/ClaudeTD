@@ -58,7 +58,20 @@ class Enemy {
                 if (this.buildingDamageTimer >= 1000) {
                     const index = buildings.indexOf(this.targetBuilding);
                     if (index > -1) {
+                             console.log('Before destruction:', {
+                                buildingsLeft: buildings.length,
+                                hasPlacedFirst: ui.hasPlacedFirstBuilding
+                            });
                         buildings.splice(index, 1);
+                            console.log('After destruction:', {
+                                buildingsLeft: buildings.length,
+                                hasPlacedFirst: ui.hasPlacedFirstBuilding,
+                                shouldTriggerGameOver: ui.hasPlacedFirstBuilding && buildings.length === 0
+                            });
+                        if (ui.hasPlacedFirstBuilding && buildings.length === 0) {
+                            console.log('Calling gameOver()');
+                            ui.gameOver();
+                        }
                     }
                     this.buildingDamageTimer = 0;
                 }

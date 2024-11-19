@@ -1,15 +1,66 @@
 let lastTime = Date.now();
 let waveManager;
+let gameStarted = false;
 
-class UI {
+class UI {    
     constructor() {
         this.hoveredTile = { x: 0, y: 0 };
         this.setupEventListeners();
         this.resizeCanvas();
+
+        // Start screen handler
+    document.getElementById('startScreen').addEventListener('click', () => {
+        gameStarted = true;
+        document.getElementById('startScreen').style.display = 'none';
+        this.startGame();
+        });
+    this.hasPlacedFirstBuilding = false;
     }
 
+    checkGameOver() {
+            if (this.hasPlacedFirstBuilding && buildings.length === 0) {
+                this.gameOver();
+            }
+        }
+
+    gameOver() {  
+        console.log('Game Over method started');
+        const overlay = document.createElement('div');
+        overlay.className = 'absolute inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center';
+        overlay.innerHTML = `
+            <div class="text-cyan-400 text-2xl">
+                Game Over!<br>
+                You survived ${waveManager.waveNumber} waves
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        // Stop the game loop first
+        cancelAnimationFrame(gameLoopId);
+        gameLoopId = null;  // Clear the ID
+        
+        // Stop wave timer
+        if (waveManager) {
+            waveManager.timeUntilNextWave = Infinity;  // Or some other way to stop wave timer
+        }
+        
+        console.log('Game Over method completed');
+    }
+
+    startGame() {
+        document.getElementById('gameContent').style.display = 'block';
+        waveManager = new WaveManager();
+        gameLoopId = requestAnimationFrame(gameLoop);  // Initialize it here too
+    }
+    
     setupEventListeners() {
         window.addEventListener('resize', () => this.resizeCanvas());
+
+        window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    selectedBuilding = null;
+                }
+            });
 
         canvas.addEventListener('mousemove', (e) => {
             const worldPos = camera.screenToWorld(e.clientX, e.clientY);
@@ -23,9 +74,12 @@ class UI {
                 
                 if (BuildingPlacement.canPlaceBuilding(worldPos.x, worldPos.y, selectedBuilding)) {
                     if (dnaUnits >= buildingCost) {
+                        console.log('Before placing first building:', this.hasPlacedFirstBuilding);
                         buildings.push(new Building(selectedBuilding, worldPos.x, worldPos.y));
                         dnaUnits -= buildingCost;
                         this.updateResourceDisplay();
+                        this.hasPlacedFirstBuilding = true;
+                        console.log('After placing first building:', this.hasPlacedFirstBuilding);
                     }
                 }
             }
@@ -217,6 +271,10 @@ function selectBuilding(type) {
     selectedBuilding = type;
 }
 
+// In game loop
+let gameLoopId;
+
+
 function gameLoop() {
     const currentTime = Date.now();
     const deltaTime = currentTime - lastTime;
@@ -228,10 +286,8 @@ function gameLoop() {
     ui.render();
     
     lastTime = currentTime;
-    requestAnimationFrame(gameLoop);
+    gameLoopId = requestAnimationFrame(gameLoop);  // Set it here
 }
 
 window.addEventListener('load', () => {
-    waveManager = new WaveManager(); // Create instance after all scripts are loaded
-    gameLoop();
 });
