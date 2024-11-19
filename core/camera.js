@@ -17,6 +17,27 @@ class Camera {
         this.mouseY = window.innerHeight / 2;
         this.keys = {};
 
+         // Touch device detection
+            this.isTouchDevice = 'ontouchstart' in window;
+
+        // Touch panning state
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+            this.isPanning = false;
+
+        // Touch zoom state
+            this.initialPinchDistance = 0;
+            this.initialZoom = 1;
+            this.pinchCenterX = 0;
+            this.pinchCenterY = 0;
+
+        // Touch events
+        if (this.isTouchDevice) {
+            canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e));
+            canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e));
+            canvas.addEventListener('touchend', () => this.handleTouchEnd());
+        }
+
         window.addEventListener('mousemove', (e) => {
             this.mouseX = e.clientX;
             this.mouseY = e.clientY;
@@ -51,67 +72,87 @@ class Camera {
                 this.y = mouseWorldY * this.zoom - this.mouseY;
             }
         });
+    }
+    handleTouchStart(e) {
+        if (e.touches.length === 1) {
+            // Single touch - start panning
+            this.touchStartX = e.touches[0].clientX;
+            this.touchStartY = e.touches[0].clientY;
+            this.isPanning = true;
+        } else if (e.touches.length === 2) {
+            // Pinch zoom start
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            
+            // Calculate initial pinch center
+            this.pinchCenterX = (touch1.clientX + touch2.clientX) / 2;
+            this.pinchCenterY = (touch1.clientY + touch2.clientY) / 2;
+            
+            // Calculate initial distance
+            const dx = touch1.clientX - touch2.clientX;
+            const dy = touch1.clientY - touch2.clientY;
+            this.initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+            this.initialZoom = this.zoom;
+            
+            this.isPanning = false;
+        }
+    }
 
-        // Touch zoom variables
-                this.touchStartDistance = 0;
-                this.touchStartZoom = 1;
-                
-        // Touch events for mobile
-        canvas.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                // Calculate initial pinch distance
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                this.touchStartDistance = Math.sqrt(dx * dx + dy * dy);
-                this.touchStartZoom = this.zoom;
-            }
-        });
-        
-        canvas.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 2) {
-           
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                const newDistance = Math.sqrt(dx * dx + dy * dy);
-                
-                const zoomDelta = newDistance / this.touchStartDistance;
-                const newZoom = this.touchStartZoom * zoomDelta;
-                
-                this.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
-                e.preventDefault();
-            }
-        });
+    handleTouchMove(e) {
+        e.preventDefault();  // Prevent scrolling
 
+        if (this.isPanning && e.touches.length === 1) {
+            // Pan based on touch movement
+            const dx = e.touches[0].clientX - this.touchStartX;
+            const dy = e.touches[0].clientY - this.touchStartY;
+            
+            this.x -= dx / this.zoom;
+            this.y -= dy / this.zoom;
+            
+            this.touchStartX = e.touches[0].clientX;
+            this.touchStartY = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+            const touch1 = e.touches[0];
+            const touch2 = e.touches[1];
+            
+            // Calculate new pinch distance
+            const dx = touch1.clientX - touch2.clientX;
+            const dy = touch1.clientY - touch2.clientY;
+            const newDistance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Calculate zoom change with reduced speed
+            const zoomDelta = (newDistance / this.initialPinchDistance - 1) * 0.325;  // Reduced speed
+            const newZoom = this.initialZoom * (1 + zoomDelta);
+            
+            // Calculate position relative to pinch center
+            const worldX = (this.pinchCenterX + this.x) / this.zoom;
+            const worldY = (this.pinchCenterY + this.y) / this.zoom;
+            
+            this.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+            
+            // Adjust position to keep pinch center stable
+            this.x = worldX * this.zoom - this.pinchCenterX;
+            this.y = worldY * this.zoom - this.pinchCenterY;
+            }   
+    }           
 
-        let touchTimeout;
-        canvas.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                touchTimeout = setTimeout(() => {
-                    const worldPos = this.screenToWorld(e.touches[0].clientX, e.touches[0].clientY);
-                    this.hoveredTile = worldPos;
-                }, 500); // 500ms hold to show preview
-            }
-        });
-
-        canvas.addEventListener('touchend', () => {
-            clearTimeout(touchTimeout);
-        });
-
-         canvas.addEventListener('touchcancel', () => {
-            clearTimeout(touchTimeout);
-        });  
-
+    handleTouchEnd() {
+        this.isPanning = false;
     }
 
     update(mapWidth, mapHeight) {
         let dx = 0;
         let dy = 0;
 
-        if (this.mouseX >= 0 && this.mouseY >= 0) {
-            if (this.mouseX < CAMERA_EDGE_THRESHOLD * 2) dx -= CAMERA_EDGE_SPEED;
-            if (this.mouseX > canvas.width - CAMERA_EDGE_THRESHOLD * 2) dx += CAMERA_EDGE_SPEED;
-            if (this.mouseY < CAMERA_EDGE_THRESHOLD * 2) dy -= CAMERA_EDGE_SPEED;
-            if (this.mouseY > canvas.height - CAMERA_EDGE_THRESHOLD * 2) dy += CAMERA_EDGE_SPEED;
+        if (!this.isTouchDevice) {
+            const isOverUI = document.querySelector('#ui').matches(':hover');
+
+            if (this.mouseX >= 0 && this.mouseY >= 0 && !isOverUI) {  // Added !isOverUI check
+                if (this.mouseX < CAMERA_EDGE_THRESHOLD * 2) dx -= CAMERA_EDGE_SPEED;
+                if (this.mouseX > canvas.width - CAMERA_EDGE_THRESHOLD * 2) dx += CAMERA_EDGE_SPEED;
+                if (this.mouseY < CAMERA_EDGE_THRESHOLD * 2) dy -= CAMERA_EDGE_SPEED;
+                if (this.mouseY > canvas.height - CAMERA_EDGE_THRESHOLD * 2) dy += CAMERA_EDGE_SPEED;
+            }
         }
 
         if (this.keys['ArrowLeft'] || this.keys['a']) dx -= CAMERA_KEY_SPEED;
@@ -140,5 +181,13 @@ class Camera {
         };
     }
 }
+
+    function selectBuilding(type) {
+        selectedBuilding = type;
+        const deselectBtn = document.getElementById('deselectButton');
+        if (deselectBtn) {
+            deselectBtn.style.display = type ? 'block' : 'none';
+        }
+    }
 
 const camera = new Camera();

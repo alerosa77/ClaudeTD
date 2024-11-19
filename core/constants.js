@@ -11,7 +11,7 @@ const MAP_SIZE = 200;
 const CAMERA_EDGE_THRESHOLD = 40;
 const CAMERA_EDGE_SPEED = 12;  // Increased from 8
 const CAMERA_KEY_SPEED = 12;
-const MIN_ZOOM = 0.5;
+const MIN_ZOOM = 0.65;
 const MAX_ZOOM = 1.5;
 const ZOOM_SPEED = 0.1;
 
@@ -61,7 +61,7 @@ const ENEMY_CORE_SIZE = 4;     // Size of enemy core in pixels
 // Alternative tile chances
 const ALTERNATIVE_TILE_CHANCES = {
     FLOWERS: 0.02,  // 5% chance
-    DIRT: 0.00,     // 0% chance
+    TREE: 0.005,     // 0.5% chance
     ROCKS: 0.005,    // 0.5% chance
     DEAD: 0.00      // 0% chance
 };
@@ -150,7 +150,7 @@ const PREVIEW_LINE_WIDTH = 0.5;
 const PLAIN_TILE_TEXTURES = {
     GRASS: 'https://opengameart.org/sites/default/files/Grass_01.png',
     FLOWERS: 'https://i.ibb.co/tLD5B4z/flowers-f.png',
-    DIRT: 'x',
+    TREE: 'https://i.ibb.co/8Dh1Rm8/tree-f.png',
     ROCKS: 'https://i.ibb.co/NKvVVD5/Rocks-f.png',   
     DEAD: 'x'     
 };

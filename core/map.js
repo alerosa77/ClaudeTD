@@ -128,7 +128,7 @@ class GameMap {
                     this.tiles[y][x] = {
                         type: 'plain',
                         plainType: tileType,
-                        rotation: Math.floor(Math.random() * 4) * 90,
+                        rotation: tileType === 'TREE' ? 0 : Math.floor(Math.random() * 4) * 90,
                         darkness: Math.random() * 0.05
                     };
                 }
@@ -217,6 +217,10 @@ class GameMap {
                     
                     ctx.drawImage(
                         texture,
+                        0,
+                        5,
+                        texture.width,  // source width
+                        texture.height - 5,  // source height: subtract 1 to account for starting 1px down
                         screenPos.x - 0.5,
                         screenPos.y - 0.5,
                         (TILE_SIZE * camera.zoom) + 1,

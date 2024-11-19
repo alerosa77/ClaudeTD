@@ -34,6 +34,7 @@ body {
 }
 
 .button {
+    position: relative;
     background: linear-gradient(180deg, rgba(0,150,255,0.1) 0%, rgba(0,150,255,0.2) 100%);
     border: 2px solid rgba(0,150,255,0.3);
     box-shadow: 0 0 10px rgba(0,150,255,0.2), inset 0 0 5px rgba(0,150,255,0.2);
@@ -51,20 +52,34 @@ body {
     height: 45px;
 }
 
-/*  button.button:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0,255,255,0.5), transparent);
-} */
-
 .button:hover {
     background: linear-gradient(180deg, rgba(0,150,255,0.2) 0%, rgba(0,150,255,0.3) 100%);
     border-color: rgba(0,150,255,0.5);
     box-shadow: 0 0 15px rgba(0,150,255,0.3), inset 0 0 8px rgba(0,150,255,0.3);
+}
+
+.button::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;  /* Position above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #00FFFF;
+    font-size: 14px;
+    white-space: nowrap;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin-bottom: 5px;  /* Space between button and tooltip */
+    z-index: 100;
+    display: block;
+}
+
+.button:hover::after {
+    opacity: 1;
 }
 
 .button:disabled {
@@ -162,4 +177,37 @@ body {
     to {
         opacity: 1;
     }
+}
+
+@media (pointer: coarse) {
+   .button {
+       height: 38px;  /* 30% smaller */
+       padding: 8px 6px;
+       font-size: 14px; 
+   }
+
+   .cost {
+       font-size: 10px;
+   }
+
+   .stats {
+       padding: 6px 8px;
+       font-size: 14px;  /* 20% smaller */
+   }
+
+   #waveInfo {
+       font-size: 14px;  /* 10% smaller */
+   }
+
+   #deselectButton {
+       position: fixed;
+       bottom: 20px;
+       left: 50%;
+       transform: translateX(-50%);
+       background: rgba(0,0,0,0.7);
+       color: #00FFFF;
+       padding: 8px 16px;
+       border-radius: 4px;
+       display: none;  /* Only show when building selected */
+   }
 }

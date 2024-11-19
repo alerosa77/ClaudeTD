@@ -280,6 +280,34 @@ class Building {
         }
         
         if (this.sprite && (this.type === 'tower' || this.type === 'harvester' || this.type === 'powerPlant' || this.type === 'pylon')) {
+            // Draw shadow first for everything except pylon
+            if (this.type !== 'pylon') {
+                ctx.save();
+                const centerX = drawPos.x + (TILE_SIZE * this.size * camera.zoom) / 2;
+                const centerY = drawPos.y + (TILE_SIZE * this.size * camera.zoom) / 2;
+                const shadowOffset = TILE_SIZE * 0.2 * camera.zoom;
+                
+                const gradient = ctx.createRadialGradient(
+                    centerX, centerY + shadowOffset,
+                    0,
+                    centerX, centerY + shadowOffset,
+                    TILE_SIZE * this.size * camera.zoom * 0.6
+                );
+                gradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.ellipse(
+                    centerX, centerY + shadowOffset,
+                    TILE_SIZE * this.size * camera.zoom * 0.6,
+                    TILE_SIZE * this.size * camera.zoom * 0.3,
+                    0, 0, Math.PI * 2
+                );
+                ctx.fill();
+                ctx.restore();
+            }
+
             if (this.type === 'pylon') {
                 ctx.save();
                 const centerX = drawPos.x + (TILE_SIZE * this.size * camera.zoom) / 2;

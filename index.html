@@ -12,7 +12,7 @@
                 They are coming... you must defend yourself<br><br>
                 Power plants will generate sparks<br>
                 Sparks will power up harvesters and towers<br>
-                Harvesters will extract DNA from nearby resources<br>
+                Harvesters will extract DNA Units<br>
                 Pylons will create your spark network
             </span>
         </div>
@@ -24,19 +24,23 @@
             <div class="stats">
                 DNA Units: <span id="duDisplay">120</span>
             </div>
-            <button class="button" onclick="selectBuilding('powerPlant')">
+            <button class="button" onclick="selectBuilding('powerPlant')" data-tooltip="Generates Sparks">
                 Power Plant <span class="cost">50 DU</span>
             </button>
-            <button class="button" onclick="selectBuilding('pylon')">
+            <button class="button" onclick="selectBuilding('pylon')" data-tooltip="Distributes Sparks">
                 Pylon <span class="cost">5 DU</span>
             </button>
-            <button class="button" onclick="selectBuilding('harvester')">
+            <button class="button" onclick="selectBuilding('harvester')" data-tooltip="Collects DNA Units">
                 Harvester <span class="cost">10 DU</span>
             </button>
-            <button class="button" onclick="selectBuilding('tower')">
+            <button class="button" onclick="selectBuilding('tower')" data-tooltip="Defends your Base">
                 Tower <span class="cost">20 DU</span>
             </button>
         </div>
+    </div>
+
+    <div id="deselectButton" onclick="selectBuilding(null)">
+    Deselect
     </div>
 
  <!-- Core scripts in correct order -->

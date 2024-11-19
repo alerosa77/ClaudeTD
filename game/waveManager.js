@@ -49,7 +49,7 @@ class WaveManager {
 
     spawnEnemy(type = 'normal') {
         const isFirstWave = this.waveNumber === 1;
-        const spawnDistance = isFirstWave ? 0.75 : 1.0; // 75% distance for first wave, edge for others
+        const spawnDistance = isFirstWave ? 0.55 : 1.0; // 55% distance for first wave, edge for others
         
         // Pick a random edge to spawn from
         const edge = Math.floor(Math.random() * 4);
