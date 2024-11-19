@@ -4,9 +4,15 @@ let gameStarted = false;
 
 class UI {    
     constructor() {
+        this.isTouchDevice = ('ontouchstart' in window) || 
+                            (navigator.maxTouchPoints > 0) || 
+                            (navigator.msMaxTouchPoints > 0);
         this.hoveredTile = { x: 0, y: 0 };
         this.setupEventListeners();
         this.resizeCanvas();
+        if (this.isTouchDevice) {
+                    document.body.classList.add('touch-device');
+                }
 
         // Start screen handler
     document.getElementById('startScreen').addEventListener('click', () => {

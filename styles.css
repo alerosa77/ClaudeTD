@@ -179,7 +179,7 @@ body {
     }
 }
 
-@media (pointer: coarse) {
+@media (pointer: coarse), .touch-device {
    .button {
        height: 38px;  /* 30% smaller */
        padding: 8px 6px;
